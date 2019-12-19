@@ -3,6 +3,16 @@ function buildMetadata(sample) {
   // @TODO: Complete the following function that builds the metadata panel
 
   // Use `d3.json` to fetch the metadata for a sample
+  const url = "/metadata/" + sample;
+  let selector = d3.select("#sample-metadata");
+  selector.html("");
+  d3.json(url).then((metadata) => {
+    Object.entries(metadata).forEach(([key,value]) => {
+      selector.append("h6")
+        .text(key + ": " + value);
+    });
+
+  });
     // Use d3 to select the panel with id of `#sample-metadata`
 
     // Use `.html("") to clear any existing metadata
@@ -18,7 +28,39 @@ function buildMetadata(sample) {
 function buildCharts(sample) {
 
   // @TODO: Use `d3.json` to fetch the sample data for the plots
+  const url = "/samples/" + sample;
+  d3.json(url).then((samples) => {
+    console.log(samples);
+  
+    let otu_ids = samples["otu_ids"].slice(0,10);
+    let sample_values = samples["sample_values"].slice(0,10);
+    let otu_labels = samples["otu_labels"].slice(0,10);
 
+    let trace1 = {
+      labels: otu_ids,
+      values: sample_values,
+      hovertext: otu_labels,
+      type: "pie"
+    };
+
+    let data = [trace1];
+    Plotly.newPlot("pie",data);
+
+    let trace2 = {
+      x: otu_ids,
+      y: sample_values,
+      text: otu_labels,
+      mode: "markers",
+      marker: {
+        size: sample_values,
+        opacity: 0.5,
+        color: otu_ids
+      }
+    };
+
+    let bubble_data = [trace2];
+    Plotly.newPlot("bubble",bubble_data);
+  });
     // @TODO: Build a Bubble Chart using the sample data
 
     // @TODO: Build a Pie Chart
